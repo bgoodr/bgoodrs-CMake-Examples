@@ -55,17 +55,14 @@ dependencies:
 <!-- so commenting the following line, that works, to try favor of keeping it local, well, somewhat: -->
 <!-- ![deps.normal.png](https://img.skitch.com/20101219-8fyp8snjftrsfa3atgx72a86i.png) -->
 
-Debugging the markdown attempt #1: Try the link again but a fully qualified link to the png file:
+<!-- All of these attempts fail: -->
+<!--   Debugging the markdown attempt #2: Try the link again but using a local reference that should also work: -->
+<!--   ![deps.normal.png](raw/master/optional_targets/doc/deps.normal.png) -->
+<!--   Debugging the markdown attempt #3: Try the link again but use a leading slash: -->
+<!--   ![deps.normal.png](/raw/master/optional_targets/doc/deps.normal.png) -->
 
-![deps.normal.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/optional_targets/doc/deps.fancy.png)
-
-Debugging the markdown attempt #2: Try the link again but using a local reference that should also work:
-
-![deps.normal.png](raw/master/optional_targets/doc/deps.fancy.png)
-
-Debugging the markdown attempt #3: Try the link again but use a leading slash:
-
-![deps.normal.png](/raw/master/optional_targets/doc/deps.fancy.png)
+<!-- Leaving this in place since that is what works, but it is NOT good since it hardcodes the https://github.com/bgoodr/bgoodrs-CMake-Examples part of the URL which thwarts cloning: -->
+![deps.normal.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/optional_targets/doc/deps.normal.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
@@ -175,12 +172,8 @@ library. Execute `cmake` to build the `fancy_lib` target, as follows:
 
 That generates the `optional_targets/doc/deps.fancy.png` image which is:
 
-<!-- I should be able to do this, but it does not work: -->
-<!-- ![optional_targets/doc/deps.fancy.png](optional_targets/doc/deps.fancy.png) -->
-<!-- This doesn't work either: -->
-<!-- ![deps.fancy.png](deps.fancy.png) -->
-<!-- [deps.fancy.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.fancy.png" -->
-![deps.fancy.png](https://img.skitch.com/20101219-g3wep9q1h1w8r767x6n3unxk4k.png)
+<!-- TODO: make this be relative path. See failed attempts above. -->
+![deps.fancy.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/optional_targets/doc/deps.fancy.png)
 
 We execute `cmake` as before, but now we enable the `fancy_lib`
 library using the `BUILD_FANCY_LIB` CMake variable:
