@@ -50,7 +50,18 @@ dependencies:
 <!-- This doesn't work either: -->
 <!-- ![deps.normal.png](deps.normal.png) -->
 <!-- [deps.normal.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.normal.png" -->
-![deps.normal.png](https://img.skitch.com/20101219-8fyp8snjftrsfa3atgx72a86i.png)
+
+<!-- But then I found this: http://support.github.com/discussions/feature-requests/19-better-image-support-for-markdown  that references https://github.com/tekkub/failpanda -->
+<!-- so commenting the following line, that works, to try favor of keeping it local, well, somewhat: -->
+<!-- ![deps.normal.png](https://img.skitch.com/20101219-8fyp8snjftrsfa3atgx72a86i.png) -->
+
+Debugging the markdown attempt #1: Try the link again but a fully qualified link to the png file:
+
+![deps.normal.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/deps.normal.png)
+
+Debugging the markdown attempt #2: Try the link again but using a local reference that should also work:
+
+![deps.normal.png](raw/master/deps.normal.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
