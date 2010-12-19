@@ -28,7 +28,7 @@ You can generate the images below if you have access to the graphviz
 package used in conjunction with the `--graphviz` CMake command-line
 option.
 
-Normal Cmake Run
+Normal CMake Run
 ----------------
 
 Execute `cmake` without building the `fancy_lib` target, which is what
@@ -148,7 +148,7 @@ rebuilt.  Now we run the `appextra_exe` executable:
     /tmp/optional_targets/dirextra/dirextra.cpp:9:dirextra_func end
     /tmp/optional_targets/dirextra/appextra.cpp:12:appextra main end
 
-Fancy Cmake Run
+Fancy CMake Run
 ---------------
 
 This is the same as the run above, but also builds the `fancy_lib`
