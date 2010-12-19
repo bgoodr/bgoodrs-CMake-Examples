@@ -8,9 +8,9 @@ Optional Targets
 =================
 
 Find this example in the `optional_targets/` directory. This was
-created in response to the question at
-http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking
-specifically for: 
+created in response to the [StackOverflow
+question][global-variables-in-cmake-for-dependency-tracking]
+which asked:
 
 > I'm looking for a way to influence a CMakeLists in some subdirectory
 responsible for building a library by a CMakeLists in some other
@@ -21,7 +21,7 @@ invocation.
 
 This example sets up target-to-target dependencies between targets
 that are either libraries or executables, with some libraries or
-executables being optional and built in separate ways, based upon
+executables being optional and built in different ways, based upon
 user-specified CMake variables.
 
 You can generate the images below if you have access to the graphviz
@@ -36,12 +36,15 @@ happens by default since the BUILD_FANCY_LIB not set by default:
 
     cd optional_targets/build
     cmake .. --graphviz=deps.normal.txt
-    dot -Tsvg -odeps.fancy.svg deps.fancy.txt
+    dot -Tpng -odeps.normal.png deps.normal.txt
 
-That generates the `optional_targets/doc/deps.normal.svg` image which shows the library
+That generates the `optional_targets/doc/deps.normal.png` image which shows the library
 dependencies:
 
-![optional_targets/doc/deps.normal.svg](optional_targets/doc/deps.normal.svg)
+<!-- Can't use SVG here due to apparent security risks. Oh give me a break! -->
+<!-- http://support.github.com/discussions/feature-requests/109-svg-served-with-mime-type-textplain -->
+
+![optional_targets/doc/deps.normal.png](optional_targets/doc/deps.normal.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
@@ -147,11 +150,11 @@ library. Execute `cmake` to build the `fancy_lib` target, as follows:
 
     cd optional_targets/build
     cmake .. --graphviz=deps.fancy.txt -DBUILD_FANCY_LIB:bool=true
-    dot -Tsvg -odeps.fancy.svg deps.fancy.txt
+    dot -Tpng -odeps.fancy.png deps.fancy.txt
 
-That generates the `optional_targets/doc/deps.fancy.svg` image which is:
+That generates the `optional_targets/doc/deps.fancy.png` image which is:
 
-![optional_targets/doc/deps.fancy.svg](optional_targets/doc/deps.fancy.svg)
+![optional_targets/doc/deps.fancy.png](optional_targets/doc/deps.fancy.png)
 
 We execute `cmake` as before, but now we enable the `fancy_lib`
 library using the `BUILD_FANCY_LIB` CMake variable:
@@ -252,5 +255,5 @@ commands therein.
 
   [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
-
+  [global-variables-in-cmake-for-dependency-tracking]: http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking "StackOverflow question"
 
