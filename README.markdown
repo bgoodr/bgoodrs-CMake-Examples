@@ -25,8 +25,8 @@ executables being optional and built in different ways, based upon
 user-specified CMake variables.
 
 You can generate the images below if you have access to the graphviz
-package used in conjunction with the `--graphviz` CMake command-line
-option.
+package used in conjunction with the [--graphviz][--graphviz] CMake
+command-line option.
 
 Normal CMake Run
 ----------------
@@ -67,7 +67,8 @@ dependencies:
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
 directories, meaning it must read the `CMakeLists.txt` file in both
-directories, via the use of the `add_subdirectory` command.
+directories, via the use of the [add_subdirectory][add_subdirectory]
+command.
 
 Here is a full run done on Linux (similar output would show up for
 Windows for the Visual Studio generator, but in that case `devenv.exe`
@@ -270,23 +271,25 @@ Summary
 The top-level `optional_targets/CMakeLists.txt` file is the one that
 explicitly guides CMake into the CMakeList.txt files of the
 subdirectories, and as a result, sets up all of the targets, via the
-use of the `add_subdirectories` commands in those subdirectories. If
-you don't add the subdirectories with a call to `add_subdirectories`,
-they won't be built.
+use of the [add_subdirectory][add_subdirectory] command in those
+subdirectories. If you don't add the subdirectories with a call to
+[add_subdirectory][add_subdirectory], they won't be built.
 
 <!-- I thought the following was true on CMake 2.8.1 on Windows but I am -->
 <!-- not convinced it is. I managed to reorder the calls to -->
-<!-- `add_subdirectory` and it still built, but that was on CMake 2.8.2 -->
+<!-- [add_subdirectory][add_subdirectory] and it still built, but that was on CMake 2.8.2 -->
 <!-- running on Linux using the Makefile generator, versus the Visual -->
 <!-- Studio generator on Windows using CMake 2.8.1. So, I am comment this -->
 <!-- out the following verbiage for now until I can retest this on Windows: -->
 
 <!-- The catch here is that, as of CMake version 2.8.1, CMake requires you -->
 <!-- to list them in bottom-up order in terms of dependencies.  Try -->
-<!-- reordering the `add_subdirectory` calls inside the -->
+<!-- reordering the [add_subdirectory][add_subdirectory] calls inside the -->
 <!-- `optional_targets/CMakeLists.txt` file and rerun `cmake`, and see the -->
 <!-- errors that are emitted. -->
 
-  [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
+  [--graphvizfile]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#opt:--graphvizfile "--graphvizfile"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
+  [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
+  [add_subdirectory]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_subdirectory "add_subdirectory"
   [global-variables-in-cmake-for-dependency-tracking]: http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking "StackOverflow question"
