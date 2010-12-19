@@ -50,7 +50,7 @@ dependencies:
 <!-- This doesn't work either: -->
 <!-- ![deps.normal.png](deps.normal.png) -->
 <!-- [deps.normal.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.normal.png" -->
-![deps.normal.png](https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png)
+![deps.normal.png](https://img.skitch.com/20101219-8fyp8snjftrsfa3atgx72a86i.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
