@@ -47,7 +47,10 @@ dependencies:
 
 <!-- I should be able to do this, but it does not work: -->
 <!-- ![optional_targets/doc/deps.normal.png](optional_targets/doc/deps.normal.png) -->
-![deps.normal.png](deps.normal.png)
+<!-- This doesn't work either: -->
+<!-- ![deps.normal.png](deps.normal.png) -->
+<!-- [deps.normal.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.normal.png" -->
+![deps.normal.png](https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
@@ -159,7 +162,10 @@ That generates the `optional_targets/doc/deps.fancy.png` image which is:
 
 <!-- I should be able to do this, but it does not work: -->
 <!-- ![optional_targets/doc/deps.fancy.png](optional_targets/doc/deps.fancy.png) -->
-![deps.fancy.png](deps.fancy.png)
+<!-- This doesn't work either: -->
+<!-- ![deps.fancy.png](deps.fancy.png) -->
+<!-- [deps.fancy.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.fancy.png" -->
+![deps.fancy.png](https://img.skitch.com/20101219-g3wep9q1h1w8r767x6n3unxk4k.png)
 
 We execute `cmake` as before, but now we enable the `fancy_lib`
 library using the `BUILD_FANCY_LIB` CMake variable:
@@ -261,7 +267,5 @@ commands therein.
   [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
   [global-variables-in-cmake-for-dependency-tracking]: http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking "StackOverflow question"
-  [deps.normal.png]: https://img.skitch.com/20101219-xtkmhjqn47h3mdyq5k6c5x2kp7.png "deps.normal.png"
-  [deps.fancy.png]: https://img.skitch.com/20101219-g3wep9q1h1w8r767x6n3unxk4k.png "deps.fancy.png"
 
  
