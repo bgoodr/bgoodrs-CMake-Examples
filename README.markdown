@@ -264,13 +264,13 @@ Now the code in `optional_targets/fancy/fancy_stuff.cpp` is executing,
 showing that the `fancy_lib` library has been linked and is now active
 in the executables.
 
-Commentary
+Summary
 ---------------
 
 The top-level `optional_targets/CMakeLists.txt` file is the one that
 explicitly guides CMake into the CMakeList.txt files of the
 subdirectories, and as a result, sets up all of the targets, via the
-use of the `add_subdirectories` commands in those subdirectories If
+use of the `add_subdirectories` commands in those subdirectories. If
 you don't add the subdirectories with a call to `add_subdirectories`,
 they won't be built.
 
