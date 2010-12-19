@@ -209,13 +209,18 @@ top-level `CMakeLists.txt` file (`optional_targets/CMakeLists.txt`) like this:
 
     set (BUILD_FANCY_LIB TRUE)
 
-But did not since we want to only enable the fancy behavior at build
-time. The `BUILD_FANCY_LIB` variable is referenced in
-`optional_targets/dir11/CMakeLists.txt` and in the
-`optional_targets/fancy/CMakeLists.txt` files.
-
-Both `dir11` and `fancy` directories are referenced in
-`optional_targets/CMakeLists.txt`
+But did not since we want to only enable the fancy behavior from the
+`cmake` command line. The `BUILD_FANCY_LIB` variable is referenced in
+the `optional_targets/CMakeLists.txt` and
+`optional_targets/dir11/CMakeLists.txt` files. But even though both
+`dir11` and `fancy` directories are referenced in
+`optional_targets/CMakeLists.txt`, when CMake reads the
+`optional_targets/CMakeLists.txt` file, the `fancy` directory is now
+included due to the fact that `BUILD_FANCY_LIB` is true, but was not
+in the normal run earlier. The `optional_targets/dir11/CMakeLists.txt`
+file needs to make use of the `BUILD_FANCY_LIB` variable again so as
+to conditionally compile in the references to the `fancy_lib` library
+via the `HAVE_FANCY_LIB` CPP macro.
 
 Now executing the `appextra_exe` executable shows:
 
@@ -230,7 +235,6 @@ Now executing the `appextra_exe` executable shows:
     /tmp/optional_targets/dir11/dir11file.cpp:18:dir11_func end
     /tmp/optional_targets/dirextra/dirextra.cpp:9:dirextra_func end
     /tmp/optional_targets/dirextra/appextra.cpp:12:appextra main end
-
 
 We can build the optional `app13_exe` executable which reuses the
 fancy library as it now becomes tied in to the same `dir11`
@@ -270,18 +274,19 @@ use of the `add_subdirectories` commands in those subdirectories If
 you don't add the subdirectories with a call to `add_subdirectories`,
 they won't be built.
 
-<!-- I thought the following was true on CMake 2.8.1 on Windows -->
-<!-- but I am not convinced it is, so comment it out for now and remove it later if it is not true: -->
+<!-- I thought the following was true on CMake 2.8.1 on Windows but I am -->
+<!-- not convinced it is. I managed to reorder the calls to -->
+<!-- `add_subdirectory` and it still built, but that was on CMake 2.8.2 -->
+<!-- running on Linux using the Makefile generator, versus the Visual -->
+<!-- Studio generator on Windows using CMake 2.8.1. So, I am comment this -->
+<!-- out the following verbiage for now until I can retest this on Windows: -->
 
-<!-- The big gotcha here is that, as of CMake version 2.8.1, CMake requires -->
-<!-- you to list them in bottom-up order in terms of dependencies.  Try -->
+<!-- The catch here is that, as of CMake version 2.8.1, CMake requires you -->
+<!-- to list them in bottom-up order in terms of dependencies.  Try -->
 <!-- reordering the `add_subdirectory` calls inside the -->
-<!-- `optional_targets/CMakeLists.txt` file and rerun `cmake`, -->
 <!-- `optional_targets/CMakeLists.txt` file and rerun `cmake`, and see the -->
-<!-- errors that show up. -->
+<!-- errors that are emitted. -->
 
   [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
   [global-variables-in-cmake-for-dependency-tracking]: http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking "StackOverflow question"
-
- 
