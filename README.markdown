@@ -264,10 +264,11 @@ Commentary
 ---------------
 
 The top-level `optional_targets/CMakeLists.txt` file is the one that
-explicitly guides CMake into the CMakeList.txt files, and as a result,
-sets up all of the targets, via the use of the `add_subdirectories`
-commands therein.  If you don't add the subdirectories with a call to
-`add_subdirectories`, they won't be built.
+explicitly guides CMake into the CMakeList.txt files of the
+subdirectories, and as a result, sets up all of the targets, via the
+use of the `add_subdirectories` commands in those subdirectories If
+you don't add the subdirectories with a call to `add_subdirectories`,
+they won't be built.
 
 <!-- I thought the following was true on CMake 2.8.1 on Windows -->
 <!-- but I am not convinced it is, so comment it out for now and remove it later if it is not true: -->
