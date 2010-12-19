@@ -95,8 +95,9 @@ would be invoked instead of `make`):
     user@host:/tmp/optional_targets/build$
 
 Notice that nothing is made from that last call to `make` since this
-example has included the EXCLUDE_FROM_ALL property on all
-[add_library][add_library] and [add_executable][add_executable] commands. 
+example has included the `EXCLUDE_FROM_ALL` property on all
+[add_library][add_library] and [add_executable][add_executable]
+commands.
 
 Now we build the `app13_exe` executable:
 
