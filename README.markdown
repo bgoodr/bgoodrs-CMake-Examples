@@ -80,6 +80,7 @@ would be invoked instead of `make`):
     -- Generating done
     -- Build files have been written to: /tmp/optional_targets/build
     user@host:/tmp/optional_targets/build$ make
+    user@host:/tmp/optional_targets/build$
 
 Notice that nothing is made from that last call to `make` since this
 example has included the EXCLUDE_FROM_ALL property on all
@@ -136,8 +137,7 @@ it by default (e.g., unit-test exectuables):
     [100%] Built target appextra_exe
 
 Since we had already built the `dir11_lib` library, nothing was really
-rebuilt (well, the object files were not recompiled since they were
-not modified).  Now we run the `appextra_exe` executable:
+rebuilt.  Now we run the `appextra_exe` executable:
 
     user@host:/tmp/optional_targets/build$ ./dirextra/appextra_exe 
     /tmp/optional_targets/dirextra/appextra.cpp:10:appextra main begin
@@ -194,7 +194,7 @@ And we build it:
 
 Now, the `fancy_lib` library is not built unless `BUILD_FANCY_LIB`
 CMake variable is set to true. We could have set it inside the
-top-level CMakeLists.txt file (`optional_targets/CMakeLists.txt`) like this:
+top-level `CMakeLists.txt` file (`optional_targets/CMakeLists.txt`) like this:
 
     set (BUILD_FANCY_LIB TRUE)
 
@@ -245,6 +245,9 @@ library:
     /tmp/optional_targets/dir12/dir12file.cpp:9:dir12_func end
     /tmp/optional_targets/app13/app13.cpp:14:app13 main end
 
+Now the code in `optional_targets/fancy/fancy_stuff.cpp` is executing,
+showing that the `fancy_lib` library has been linked and is now active
+in the executables.
 
 Commentary
 ---------------
@@ -252,7 +255,8 @@ Commentary
 The top-level `optional_targets/CMakeLists.txt` file is the one that
 explicitly guides CMake into the CMakeList.txt files, and as a result,
 sets up all of the targets, via the use of the `add_subdirectories`
-commands therein. 
+commands therein.  If you don't add the subdirectories with a call to
+`add_subdirectories`, they won't be built.
 
 <!-- I thought the following was true on CMake 2.8.1 on Windows -->
 <!-- but I am not convinced it is, so comment it out for now and remove it later if it is not true: -->
