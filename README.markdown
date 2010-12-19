@@ -57,11 +57,11 @@ dependencies:
 
 Debugging the markdown attempt #1: Try the link again but a fully qualified link to the png file:
 
-![deps.normal.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/deps.normal.png)
+![deps.normal.png](https://github.com/bgoodr/bgoodrs-CMake-Examples/raw/master/optional_targets/doc/deps.fancy.png)
 
 Debugging the markdown attempt #2: Try the link again but using a local reference that should also work:
 
-![deps.normal.png](raw/master/deps.normal.png)
+![deps.normal.png](raw/master/optional_targets/doc/deps.fancy.png)
 
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
