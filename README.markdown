@@ -307,13 +307,13 @@ installation (possible exceptions may exist on Windows).
 UNIX shared library deployment is shown in this example.)
 
 Notice I am using the word "deploy" here instead of the word
-"install". By "deploy", Here, "deploy" means copying all files into
-some self-contained and relocatable directory as explained above. It
-also means rebuilding them if they are out of date w.r.t. their
-sources and dependent libraries. Also, the builtin CMake "install"
-command seems to have limitations as of CMake version 2.8.1 such as
-being difficult to tie them to code or library generation targets
-(i.e., to `add_custom_command` or `add_custom_target`).
+"install". Here, "deploy" means copying all files into some
+self-contained and relocatable directory as explained above. It also
+means rebuilding them if they are out of date w.r.t. their sources and
+dependent libraries. Also, the builtin CMake "install" command seems
+to have limitations as of CMake version 2.8.1 such as being difficult
+to tie them to code or library generation targets (i.e., to
+`add_custom_command` or `add_custom_target`).
 
 This example is similar to the Optional Targets example earlier, but
 the `fancy_lib` is now a shared library. Here, the `app13_exe`
@@ -321,6 +321,9 @@ executable now prints out the arguments passed in.
 
 The `shared_lib_targets/cmake.modules/deploy_util.cmake` file contains
 the machinery to deploy wrapper scripts, executables, and libraries.
+
+Normal CMake Run Without Shared Library
+---------------------------------------
 
 Here is a sample run that is quite similar to the Optional Targets
 example above:
@@ -358,9 +361,6 @@ misleading here:
 
 what the manual should say instead is: "Add a target with no output so
 it will always be built **when requested**."!
-
-Normal CMake Run Without Shared Library
----------------------------------------
 
 Now deploy the `app13_exe` executable using `app13_exe_deploy` target,
 and notice that the executable is built first since it was out-of-date
@@ -416,17 +416,12 @@ CMake Run with Shared Library
 
 Now we will add in the `fancy_lib` which is now made into a shared library:
 
-    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
-    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
-    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
-    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
-    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
     user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ cmake .. -DBUILD_FANCY_LIB:bool=true
     -- Configuring done
     -- Generating done
     -- Build files have been written to: /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build
 
-Now run the `app13_exe_deploy` target and watch the fancy_lib get
+Now run the `app13_exe_deploy` target and watch the `fancy_lib` be
 rebuilt:
 
     user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ make app13_exe_deploy
@@ -449,7 +444,7 @@ rebuilt:
     [ 83%] Deploying wrapper script /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/app13_exe.sh and /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/binaries/app13_exe
     [100%] Built target app13_exe_deploy
 
-to insure that the `fancy_lib` gets built and deployed as a dependent
+To insure that the `fancy_lib` gets built and deployed as a dependent
 library of the `app13_exe` target, I to use this command inside the
 `shared_lib_targets/app13/CMakeLists.txt` file:
 
@@ -486,11 +481,66 @@ that the shared library is invoked:
     /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:19:app13 main end
     user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
 
+Notice that the wrapper script template at
+`shared_lib_targets/app13/wrapper.template.sh` has `@var@` references
+that are expanded by the `configure_file` CMake command. Everything is
+kept relative to that script's directory. Constructs in that wrapper
+script are admittedly "hairy" and deserve some explanation:
+
+This construct:
+
+    ${0%@base_exe@@wrapper_extension@}
+
+Is expanded at `configure_file` time into:
+
+    ${0%app13_exe.sh}
+
+Because `base_exe` is equal to `app13_exe` and `wrapper_extension` was
+set to `.sh` in this example. It is possible, and probably more
+standard, to set `wrapper_extension` to the empty string, but then you
+would have to have the real binary directory be different from where
+the wrapper scripts are placed.
+
+That resulting Bourne shell construct:
+
+    ${0%app13_exe.sh}
+
+means to rip off the "app13_exe.sh" suffix from the value of `$0` and
+insert the result, which has the result of taking the "basename" of
+the runtie path of the generated script without wasting cycles calling
+the `basename` UNIX executable from within the script.  The relative
+path to the lib directory is then the immediate next string in the
+expression.
+
+The Bourne shell construct:
+
+    ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+means only insert the ":" and then the value of `LD_LIBRARY_PATH` if
+`LD_LIBRARY_PATH` is set to a non-empty string value. On some systems,
+an empty element in the `LD_LIBRARY_PATH` is significant to the
+runtime linker (well, it was on certain Solaris machines years ago
+... I don't know now since I don't use Solaris anymore).
+
+The Bourne shell construct:
+
+    "$@"
+
+means to wrap all of the scripts command line options with double
+quotes thus preserving white space in their arguments to the child
+process.
+
+The `exec` command overlays the shell's process with the child
+process, thus avoiding consuming more processes than needed.
+
 Summary
 ---------------
 
-This demonstrates hand-crafted CMake targets to deploy executables and
-shared libraries into a separate relocatable directory.
+This example demonstrates hand-crafted CMake targets to deploy
+executables and shared libraries into a separate relocatable
+directory, as well as the wrapper UNIX scripts that are used to invoke
+the executables in such a way as to set the proper link library
+environment.
 
   [--graphvizfile]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#opt:--graphvizfile "--graphvizfile"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
