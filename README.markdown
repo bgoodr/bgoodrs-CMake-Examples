@@ -63,6 +63,10 @@ Debugging the markdown attempt #2: Try the link again but using a local referenc
 
 ![deps.normal.png](raw/master/optional_targets/doc/deps.fancy.png)
 
+Debugging the markdown attempt #3: Try the link again but use a leading slash:
+
+![deps.normal.png](/raw/master/optional_targets/doc/deps.fancy.png)
+
 This dependency graph implies that means that `dir1/dir11` must be
 built before `dir1/dir12`.  CMake has to be told about both
 directories, meaning it must read the `CMakeLists.txt` file in both
