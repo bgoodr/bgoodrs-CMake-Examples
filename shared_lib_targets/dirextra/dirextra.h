@@ -1,0 +1,1 @@
+bool dirextra_func();

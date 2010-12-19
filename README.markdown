@@ -288,8 +288,213 @@ subdirectories. If you don't add the subdirectories with a call to
 <!-- `optional_targets/CMakeLists.txt` file and rerun `cmake`, and see the -->
 <!-- errors that are emitted. -->
 
+Deploying Executables and Shared Libraries
+=================
+
+Find this example in the `shared_lib_targets/` directory.
+
+This experiment demonstrates functions that deploy wrapper scripts,
+executables, and shared libraries into an self-contained and
+relocatable installation tree. "Relocatable" means that there are no
+embedded rpath's in the deployed executables (via a setting of
+`CMAKE_SKIP_RPATH` inside the `shared_lib_targets/CMakeLists.txt`
+file). That relocatable directory can be zipped up and extracted into
+some other directory, and the executables executed directly from there
+without having to set up enviroment variables or do any other form of
+installation (possible exceptions may exist on Windows).
+
+(TODO: Explain the Windows deployment once that is implemented; only
+UNIX shared library deployment is shown in this example.)
+
+Notice I am using the word "deploy" here instead of the word
+"install". By "deploy", Here, "deploy" means copying all files into
+some self-contained and relocatable directory as explained above. It
+also means rebuilding them if they are out of date w.r.t. their
+sources and dependent libraries. Also, the builtin CMake "install"
+command seems to have limitations as of CMake version 2.8.1 such as
+being difficult to tie them to code or library generation targets
+(i.e., to `add_custom_command` or `add_custom_target`).
+
+This example is similar to the Optional Targets example earlier, but
+the `fancy_lib` is now a shared library. Here, the `app13_exe`
+executable now prints out the arguments passed in.  
+
+The `shared_lib_targets/cmake.modules/deploy_util.cmake` file contains
+the machinery to deploy wrapper scripts, executables, and libraries.
+
+Here is a sample run that is quite similar to the Optional Targets
+example above:
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ cd /tmp
+    user@host:/tmp$ cd /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ ll
+    total 8
+    -rwxrwxr-x 1 user user 398 Dec 19 11:30 cleanall.sh
+    -rw-rw-r-- 1 user user 544 Dec 19 11:14 README.txt
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ cmake ..
+    -- The C compiler identification is GNU
+    -- The CXX compiler identification is GNU
+    -- Check for working C compiler: /usr/bin/gcc
+    -- Check for working C compiler: /usr/bin/gcc -- works
+    -- Detecting C compiler ABI info
+    -- Detecting C compiler ABI info - done
+    -- Check for working CXX compiler: /usr/bin/c++
+    -- Check for working CXX compiler: /usr/bin/c++ -- works
+    -- Detecting CXX compiler ABI info
+    -- Detecting CXX compiler ABI info - done
+    -- Configuring done
+    -- Generating done
+    -- Build files have been written to: /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build
+
+Now we do the first make:
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ make 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$
+
+Notice that nothing is built at all even though there are several
+[add_custom_target][add_custom_target] commands. The CMake manual is
+misleading here:
+
+> add_custom_target -- Add a target with no output so it will always be built.
+
+what the manual should say instead is: "Add a target with no output so
+it will always be built **when requested**."!
+
+Normal CMake Run Without Shared Library
+---------------------------------------
+
+Now deploy the `app13_exe` executable using `app13_exe_deploy` target,
+and notice that the executable is built first since it was out-of-date
+(i.e., didn't even exist in the build directory prior to the run):
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ make app13_exe_deploy
+    Scanning dependencies of target dir11_lib
+    [ 25%] Building CXX object dir11/CMakeFiles/dir11_lib.dir/dir11file.cpp.o
+    Linking CXX static library libdir11_lib.a
+    [ 25%] Built target dir11_lib
+    Scanning dependencies of target dir12_lib
+    [ 50%] Building CXX object dir12/CMakeFiles/dir12_lib.dir/dir12file.cpp.o
+    Linking CXX static library libdir12_lib.a
+    [ 50%] Built target dir12_lib
+    Scanning dependencies of target app13_exe
+    [ 75%] Building CXX object app13/CMakeFiles/app13_exe.dir/app13.cpp.o
+    Linking CXX executable app13_exe
+    [ 75%] Built target app13_exe
+    Scanning dependencies of target app13_exe_deploy
+    [ 75%] Deploying wrapper script /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/app13_exe.sh and /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/binaries/app13_exe
+    [100%] Built target app13_exe_deploy
+
+That line above, "Deploying wrapper script ..." is from the
+`add_deploy_executable_target` function defined in the
+`shared_lib_targets/cmake.modules/deploy_util.cmake` file. It is
+creating the wrapper script **and** copying the executable into a
+deployment directory.  The paths to the deployment directories are
+specified in this example in the `shared_lib_targets/CMakeLists.txt`
+file, and referenced in a call to `add_deploy_executable_target`
+inside `shared_lib_targets/app13/CMakeLists.txt`.
+
+Now execute the wrapper script, passing it arguments that contain
+whitespace to insure that the wrapper script is dutifully passing the
+original arguments to the real executable unmolested:
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/app13_exe.sh "hello" "cruel world"
+    LD_LIBRARY_PATH=="/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../lib"
+    + exec /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../binaries/app13_exe hello cruel world
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:12:app13 main begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:13:app13 listing arguments to verify that wrapper script preserves them as expected ...
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[0] == "/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../binaries/app13_exe"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[1] == "hello"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[2] == "cruel world"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir12/dir12file.cpp:7:dir12_func begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:10:dir11_func begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:15:Some basic functionality here.
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:18:dir11_func end
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir12/dir12file.cpp:9:dir12_func end
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:19:app13 main end
+
+CMake Run with Shared Library
+-----------------------------
+
+Now we will add in the `fancy_lib` which is now made into a shared library:
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ cmake .. -DBUILD_FANCY_LIB:bool=true
+    -- Configuring done
+    -- Generating done
+    -- Build files have been written to: /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build
+
+Now run the `app13_exe_deploy` target and watch the fancy_lib get
+rebuilt:
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ make app13_exe_deploy
+    Scanning dependencies of target fancy_lib
+    [ 16%] Building CXX object fancy/CMakeFiles/fancy_lib.dir/fancy_stuff.cpp.o
+    Linking CXX shared library libfancy_lib.so
+    [ 16%] Built target fancy_lib
+    Scanning dependencies of target dir11_lib
+    [ 33%] Building CXX object dir11/CMakeFiles/dir11_lib.dir/dir11file.cpp.o
+    Linking CXX static library libdir11_lib.a
+    [ 33%] Built target dir11_lib
+    Scanning dependencies of target dir12_lib
+    [ 50%] Built target dir12_lib
+    Scanning dependencies of target app13_exe
+    Linking CXX executable app13_exe
+    [ 66%] Built target app13_exe
+    Scanning dependencies of target fancy_lib_deploy
+    [ 66%] Deploying /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/lib/libfancy_lib.so
+    [ 83%] Built target fancy_lib_deploy
+    [ 83%] Deploying wrapper script /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/app13_exe.sh and /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/binaries/app13_exe
+    [100%] Built target app13_exe_deploy
+
+to insure that the `fancy_lib` gets built and deployed as a dependent
+library of the `app13_exe` target, I to use this command inside the
+`shared_lib_targets/app13/CMakeLists.txt` file:
+
+    add_dependencies (app13_exe_deploy fancy_lib_deploy)
+
+conditionally based upon whether or not the `BUILD_FANCY_LIB` user
+variable was set to `TRUE`, and it was. The `fancy_lib_deploy` target
+was created via a call to the `add_deploy_lib_target` function which
+is also defined in the
+`shared_lib_targets/cmake.modules/deploy_util.cmake` file. All that
+function does is copy the shared library on UNIX, but there may or may
+not be more to do on Windows for App Local Deployment (which is a TODO
+item left in the code).
+
+Now invoking the same wrapper script with the same arguments shows
+that the shared library is invoked:
+
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/app13_exe.sh "hello" "cruel world"
+    LD_LIBRARY_PATH=="/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../lib"
+    + exec /tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../binaries/app13_exe hello cruel world
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:12:app13 main begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:13:app13 listing arguments to verify that wrapper script preserves them as expected ...
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[0] == "/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build/install/bin/../binaries/app13_exe"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[1] == "hello"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:16:app13 argv[2] == "cruel world"
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir12/dir12file.cpp:7:dir12_func begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:10:dir11_func begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:12:Executing some fancy behavior now.
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/fancy/fancy_stuff.cpp:6:do_something_quite_fancy begin
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/fancy/fancy_stuff.cpp:7:Ok, now show me the money.
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/fancy/fancy_stuff.cpp:8:do_something_quite_fancy end
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir11/dir11file.cpp:18:dir11_func end
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/dir12/dir12file.cpp:9:dir12_func end
+    /tmp/bgoodrs-CMake-Examples/shared_lib_targets/app13/app13.cpp:19:app13 main end
+    user@host:/tmp/bgoodrs-CMake-Examples/shared_lib_targets/build$ 
+
+Summary
+---------------
+
+This demonstrates hand-crafted CMake targets to deploy executables and
+shared libraries into a separate relocatable directory.
+
   [--graphvizfile]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#opt:--graphvizfile "--graphvizfile"
   [add_executable]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_executable "add_executable"
   [add_library]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library "add_library"
   [add_subdirectory]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_subdirectory "add_subdirectory"
+  [add_custom_target]: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_custom_target "add_custom_target"
   [global-variables-in-cmake-for-dependency-tracking]: http://stackoverflow.com/questions/4372512/global-variables-in-cmake-for-dependency-tracking "StackOverflow question"
