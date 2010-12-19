@@ -136,7 +136,7 @@ active only because the `HAVE_FANCY_LIB` CPP macro is not defined.
 
 Now we can build the truly optional `appextra_exe` executable. It is
 optional in the sense that just running `make` by itself doesn't build
-it by default (e.g., unit-test exectuables):
+it by default (e.g., unit-test executables):
 
     user@host:/tmp/optional_targets/build$ make appextra_exe
     [ 33%] Built target dir11_lib
@@ -149,8 +149,10 @@ it by default (e.g., unit-test exectuables):
     Linking CXX executable appextra_exe
     [100%] Built target appextra_exe
 
-Since we had already built the `dir11_lib` library, nothing was really
-rebuilt.  Now we run the `appextra_exe` executable:
+Since we had already built the `dir11_lib` library, there was no need
+to rebuild it, but only a need to rebuild the dependent libraries and
+the executable. Now running the `appextra_exe` executable runs as
+expected:
 
     user@host:/tmp/optional_targets/build$ ./dirextra/appextra_exe 
     /tmp/optional_targets/dirextra/appextra.cpp:10:appextra main begin
